@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import "invoiceBuana/delivery"
 
 func main() {
-	fmt.Println("Hello, World!")
+
+	delivery.Server().Run()
+
 }
