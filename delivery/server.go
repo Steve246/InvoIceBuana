@@ -2,6 +2,8 @@ package delivery
 
 import (
 	"invoiceBuana/config"
+	"invoiceBuana/delivery/controller"
+	"invoiceBuana/manager"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -9,7 +11,8 @@ import (
 )
 
 type appServer struct {
-	router    *gin.RouterGroup
+	usecaseManager manager.UsecaseManager
+	// router         *gin.RouterGroup
 	routerDev *gin.RouterGroup
 	engine    *gin.Engine
 	host      string
@@ -20,11 +23,11 @@ func Server() *appServer {
 
 	appConfig := config.NewConfig()
 
-	// infra := manager.NewInfra(appConfig)
+	infra := manager.NewInfra(appConfig)
 
-	// repoManager := manager.NewRepositoryManager(infra)
+	repoManager := manager.NewRepositoryManager(infra)
 
-	// usecaseManager := manager.NewUsecaseManager(repoManager)
+	usecaseManager := manager.NewUsecaseManager(repoManager)
 
 	host := appConfig.Url
 	// Add CORS middleware
@@ -37,11 +40,11 @@ func Server() *appServer {
 	}))
 
 	return &appServer{
-		// usecaseManager: usecaseManager,
-		engine: router,
-		// router:         router.Group("", middleware.NewAuthTokenMiddleware(usecaseManager.TokenUsecase()).RequiredToken()),
+		usecaseManager: usecaseManager,
+		engine:         router,
+		// router:         router.Group("", nil),
 
-		routerDev: router.Group("activation/"),
+		routerDev: router.Group("invoice/"),
 		host:      host,
 	}
 }
@@ -49,7 +52,7 @@ func Server() *appServer {
 func (a *appServer) initControllers() {
 	// buat daftarin controller ada disini
 	// setiap controller, isinya harus ada isian dari usecaseManager
-
+	controller.NewCustomerController(a.routerDev, a.usecaseManager.CustomerUsecase())
 }
 
 func (a *appServer) Run() {
