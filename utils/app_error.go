@@ -35,6 +35,14 @@ func CreateIdError() error {
 
 // item
 
+func GetItemError() error {
+	return AppError{
+		ErrorCode:    "400",
+		ErrorMessage: "No Item Found",
+		ErrorType:    http.StatusBadRequest,
+	}
+}
+
 func CreateItemsError() error {
 	return AppError{
 		ErrorCode:    "409",

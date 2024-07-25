@@ -16,6 +16,22 @@ type CustomerController struct {
 	api.BaseApi
 }
 
+func (u *CustomerController) getAllCustomer(c *gin.Context) {
+
+	limitParam := c.DefaultQuery("limit", "10")
+	offsetParam := c.DefaultQuery("offset", "0")
+
+	data, err := u.ucCustomer.GetAllCustomer(limitParam, offsetParam)
+	if err != nil {
+		u.Failed(c, err)
+		return
+
+	}
+
+	detailMsg := "Customer Data Succesfully Retrieved"
+	u.Success(c, data, detailMsg, "register")
+}
+
 func (u *CustomerController) addNewCustomer(c *gin.Context) {
 	var bodyRequest dto.CreateCustomer
 
@@ -43,6 +59,8 @@ func NewCustomerController(routerDev *gin.RouterGroup, ucCustomer usecase.Custom
 		ucCustomer: ucCustomer,
 		BaseApi:    api.BaseApi{},
 	}
+
+	routerDev.GET("/display/customer", controller.getAllCustomer)
 
 	routerDev.POST("/add/customer", controller.addNewCustomer)
 }

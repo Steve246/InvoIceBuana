@@ -16,6 +16,21 @@ type ItemController struct {
 	api.BaseApi
 }
 
+func (i *ItemController) getAllItem(c *gin.Context) {
+	limitParam := c.DefaultQuery("limit", "10")
+	offsetParam := c.DefaultQuery("offset", "0")
+
+	data, err := i.ucItem.GetAllItem(limitParam, offsetParam)
+	if err != nil {
+		i.Failed(c, err)
+		return
+	}
+
+	detailMsg := "Item Data Succesfully Retrieved"
+	i.Success(c, data, detailMsg, "register")
+
+}
+
 func (i *ItemController) addNewItem(c *gin.Context) {
 	var bodyRequest dto.CreateItem
 
@@ -43,6 +58,8 @@ func NewItemController(routerDev *gin.RouterGroup, ucItem usecase.ItemUsecase) {
 		ucItem:    ucItem,
 		BaseApi:   api.BaseApi{},
 	}
+
+	routerDev.GET("/display/items", controller.getAllItem)
 
 	routerDev.POST("/add/items", controller.addNewItem)
 }

@@ -8,11 +8,22 @@ import (
 )
 
 type ItemUsecase interface {
+	GetAllItem(limit, offset string) ([]dto.DisplayItem, error)
 	CreateItem(request dto.CreateItem) error
 }
 
 type itemUsecase struct {
 	itemRepo repository.ItemRepository
+}
+
+func (i *itemUsecase) GetAllItem(limit, offset string) ([]dto.DisplayItem, error) {
+	dataItem, err := i.itemRepo.GetAll(limit, offset)
+
+	if err != nil {
+		return []dto.DisplayItem{}, utils.GetItemError()
+	}
+
+	return dataItem, err
 }
 
 func (i *itemUsecase) CreateItem(request dto.CreateItem) error {

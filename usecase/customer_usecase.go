@@ -8,7 +8,7 @@ import (
 )
 
 type CustomerUsecase interface {
-	GetAllCustomer() ([]model.Customer, error)
+	GetAllCustomer(limit, offset string) ([]dto.DisplayCustomer, error)
 	CreateCustomer(request dto.CreateCustomer) error
 }
 
@@ -16,11 +16,11 @@ type customerUsecase struct {
 	customerRepo repository.CustomerRepository
 }
 
-func (r *customerUsecase) GetAllCustomer() ([]model.Customer, error) {
-	dataCustomer, err := r.customerRepo.GetAll()
+func (r *customerUsecase) GetAllCustomer(limit, offset string) ([]dto.DisplayCustomer, error) {
+	dataCustomer, err := r.customerRepo.GetAll(limit, offset)
 
 	if err != nil {
-		return []model.Customer{}, err
+		return []dto.DisplayCustomer{}, utils.GetCustomerError()
 	}
 
 	return dataCustomer, nil

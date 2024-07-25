@@ -3,13 +3,14 @@ package repository
 import (
 	"fmt"
 	"invoiceBuana/model"
+	"invoiceBuana/model/dto"
 
 	"gorm.io/gorm"
 )
 
 type CustomerRepository interface {
 	GetDuplicateByName(name string) (bool, error)
-	GetAll() ([]model.Customer, error)
+	GetAll(limit, offset string) ([]dto.DisplayCustomer, error)
 	Create(customer *model.Customer) error
 }
 
@@ -32,12 +33,12 @@ func (r *customerRepository) GetDuplicateByName(name string) (bool, error) {
 	}
 }
 
-func (r *customerRepository) GetAll() ([]model.Customer, error) {
-	var customers []model.Customer
+func (r *customerRepository) GetAll(limit, offset string) ([]dto.DisplayCustomer, error) {
+	var customers []dto.DisplayCustomer
 
-	query := `SELECT id, customer_id, customer_name, customer_address, created_at, updated_at FROM Customer`
+	query := `SELECT customer_id, customer_name, customer_address FROM Customer LIMIT ? OFFSET ?`
 
-	rows, err := r.db.Raw(query).Rows()
+	rows, err := r.db.Raw(query, limit, offset).Rows()
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +50,8 @@ func (r *customerRepository) GetAll() ([]model.Customer, error) {
 	// remapped using append to get all data customer
 
 	for rows.Next() {
-		var customer model.Customer
-		if err := rows.Scan(&customer.ID, &customer.CustomerID, &customer.CustomerName, &customer.CustomerAddress, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+		var customer dto.DisplayCustomer
+		if err := rows.Scan(&customer.CustomerID, &customer.CustomerName, &customer.CustomerAddress); err != nil {
 			return nil, err
 		}
 		customers = append(customers, customer)
