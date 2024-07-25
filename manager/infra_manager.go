@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
@@ -41,7 +42,7 @@ func initDbResource(dataSourceName string) (*gorm.DB, error) {
 
 	// Open MySQL connection with GORM
 	db, err := gorm.Open(mysql.Open(dataSourceName), &gorm.Config{})
-	fmt.Println("ini db --> ", db)
+	// fmt.Println("ini db --> ", db)
 
 	if err != nil {
 		return nil, err
@@ -56,7 +57,12 @@ func initDbResource(dataSourceName string) (*gorm.DB, error) {
 
 		migrationDirection := os.Getenv("MIGRATION_DIRECTION")
 
+		fmt.Println("proses migrasi akan dilakukan")
+
 		err := runMigrations(dataSourceName, migrationDirection)
+
+		fmt.Println("proses migrasi berhasil dilakukan")
+
 		if err != nil {
 			return nil, err
 		}
