@@ -7,6 +7,6 @@ package dto
 // }
 
 type CreateCustomer struct {
-	CustomerName    string `json: "custName"`
-	CustomerAddress string `json: "custAddress"`
+	CustomerName    string `json:"custName"`
+	CustomerAddress string `json:"custAddress"`
 }

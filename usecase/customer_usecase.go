@@ -5,8 +5,6 @@ import (
 	"invoiceBuana/model/dto"
 	"invoiceBuana/repository"
 	"invoiceBuana/utils"
-
-	"gorm.io/gorm"
 )
 
 type CustomerUsecase interface {
@@ -30,14 +28,29 @@ func (r *customerUsecase) GetAllCustomer() ([]model.Customer, error) {
 
 func (r *customerUsecase) CreateCustomer(request dto.CreateCustomer) error {
 
+	// generate customer id
+
 	generateCustomerId, err := utils.GenerateUserID()
 
 	if err != nil {
 		return utils.IdCustomerError()
 	}
 
+	// check for duplicate
+
+	dataDuplicate, err := r.customerRepo.GetByName(request.CustomerName)
+
+	if err != nil {
+		return utils.CreateCustomerError()
+	}
+
+	if dataDuplicate == true {
+		return utils.DuplicateCustomer()
+	}
+
+	// insert customer
+
 	dataCustomer := &model.Customer{
-		Model:           gorm.Model{},
 		CustomerID:      generateCustomerId,
 		CustomerName:    request.CustomerName,
 		CustomerAddress: request.CustomerAddress,

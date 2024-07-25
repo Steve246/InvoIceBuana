@@ -17,6 +17,14 @@ func (e AppError) Error() string {
 
 // customer
 
+func DuplicateCustomer() error {
+	return AppError{
+		ErrorCode:    "409",
+		ErrorMessage: "Customer already exist",
+		ErrorType:    http.StatusConflict,
+	}
+}
+
 func IdCustomerError() error {
 	return AppError{
 		ErrorCode:    "500",
@@ -27,7 +35,7 @@ func IdCustomerError() error {
 
 func CreateCustomerError() error {
 	return AppError{
-		ErrorCode:    "400",
+		ErrorCode:    "409",
 		ErrorMessage: "Create Customer Failed",
 		ErrorType:    http.StatusConflict,
 	}

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"invoiceBuana/delivery/api"
 	"invoiceBuana/model/dto"
 	"invoiceBuana/usecase"
@@ -23,6 +24,8 @@ func (u *CustomerController) addNewCustomer(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("ini isi body --> ", bodyRequest)
+
 	err := u.ucCustomer.CreateCustomer(bodyRequest)
 	if err != nil {
 		u.Failed(c, err)
@@ -41,5 +44,5 @@ func NewCustomerController(routerDev *gin.RouterGroup, ucCustomer usecase.Custom
 		BaseApi:    api.BaseApi{},
 	}
 
-	routerDev.POST("/add/items", controller.addNewCustomer)
+	routerDev.POST("/add/customer", controller.addNewCustomer)
 }
