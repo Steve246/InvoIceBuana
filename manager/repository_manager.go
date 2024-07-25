@@ -4,10 +4,15 @@ import "invoiceBuana/repository"
 
 type RepositoryManager interface {
 	CustomerRepo() repository.CustomerRepository
+	ItemRepo() repository.ItemRepository
 }
 
 type repositoryManager struct {
 	infra Infra
+}
+
+func (r *repositoryManager) ItemRepo() repository.ItemRepository {
+	return repository.NewItemRepository(r.infra.SqlDb())
 }
 
 func (r *repositoryManager) CustomerRepo() repository.CustomerRepository {

@@ -15,6 +15,42 @@ func (e AppError) Error() string {
 	return fmt.Sprintf("type: %d, code: %s, err: %s", e.ErrorType, e.ErrorCode, e.ErrorMessage)
 }
 
+// universal error
+
+func ReqBodyNotValidError() error {
+	return AppError{
+		ErrorCode:    "400",
+		ErrorMessage: "Bad request",
+		ErrorType:    http.StatusBadRequest,
+	}
+}
+
+func CreateIdError() error {
+	return AppError{
+		ErrorCode:    "500",
+		ErrorMessage: "Created Id Failed",
+		ErrorType:    http.StatusInternalServerError,
+	}
+}
+
+// item
+
+func CreateItemsError() error {
+	return AppError{
+		ErrorCode:    "409",
+		ErrorMessage: "Create Item Failed",
+		ErrorType:    http.StatusConflict,
+	}
+}
+
+func DuplicateItemError() error {
+	return AppError{
+		ErrorCode:    "409",
+		ErrorMessage: "Item's already exist",
+		ErrorType:    http.StatusConflict,
+	}
+}
+
 // customer
 
 func DuplicateCustomer() error {
@@ -22,14 +58,6 @@ func DuplicateCustomer() error {
 		ErrorCode:    "409",
 		ErrorMessage: "Customer already exist",
 		ErrorType:    http.StatusConflict,
-	}
-}
-
-func IdCustomerError() error {
-	return AppError{
-		ErrorCode:    "500",
-		ErrorMessage: "Created Customer Id Failed",
-		ErrorType:    http.StatusInternalServerError,
 	}
 }
 
@@ -46,82 +74,5 @@ func GetCustomerError() error {
 		ErrorCode:    "400",
 		ErrorMessage: "No Customer Found",
 		ErrorType:    http.StatusConflict,
-	}
-}
-
-// product
-
-func ProductsNotFound() error {
-	return AppError{
-		ErrorCode:    "404",
-		ErrorMessage: "id is not found",
-		ErrorType:    http.StatusNotFound,
-	}
-}
-
-func GetProductError() error {
-	return AppError{
-		ErrorCode:    "400",
-		ErrorMessage: "Get Product Failed",
-		ErrorType:    http.StatusConflict,
-	}
-}
-
-func CreateProductError() error {
-	return AppError{
-		ErrorCode:    "400",
-		ErrorMessage: "Create Product Failed",
-		ErrorType:    http.StatusConflict,
-	}
-}
-
-// register
-func PhoneNumberFoundError() error {
-	return AppError{
-		ErrorCode:    "409",
-		ErrorMessage: "Phone Number found inside Database",
-		ErrorType:    http.StatusConflict,
-	}
-}
-
-func ReqBodyNotValidError() error {
-	return AppError{
-		ErrorCode:    "400",
-		ErrorMessage: "Didn't pass Validation",
-		ErrorType:    http.StatusBadRequest,
-	}
-}
-
-func ServerError() error {
-	return AppError{
-		ErrorCode:    "500",
-		ErrorMessage: "Server Error",
-		ErrorType:    http.StatusInternalServerError,
-	}
-}
-
-// login
-
-func PasswordCannotBeEncodeError() error {
-	return AppError{
-		ErrorCode:    "400",
-		ErrorMessage: "Password cannot be encode",
-		ErrorType:    http.StatusBadRequest,
-	}
-}
-
-func UserNotFoundError() error {
-	return AppError{
-		ErrorCode:    "404",
-		ErrorMessage: "User Not Found",
-		ErrorType:    http.StatusInternalServerError,
-	}
-}
-
-func PasswordWrongError() error {
-	return AppError{
-		ErrorCode:    "400",
-		ErrorMessage: "Password Is Wrong",
-		ErrorType:    http.StatusInternalServerError,
 	}
 }

@@ -4,10 +4,15 @@ import "invoiceBuana/usecase"
 
 type UsecaseManager interface {
 	CustomerUsecase() usecase.CustomerUsecase
+	ItemUsecase() usecase.ItemUsecase
 }
 
 type usecaseManager struct {
 	repoManager RepositoryManager
+}
+
+func (u *usecaseManager) ItemUsecase() usecase.ItemUsecase {
+	return usecase.NewItemUsecase(u.repoManager.ItemRepo())
 }
 
 func (u *usecaseManager) CustomerUsecase() usecase.CustomerUsecase {

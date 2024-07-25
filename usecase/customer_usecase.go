@@ -33,12 +33,12 @@ func (r *customerUsecase) CreateCustomer(request dto.CreateCustomer) error {
 	generateCustomerId, err := utils.GenerateUserID()
 
 	if err != nil {
-		return utils.IdCustomerError()
+		return utils.CreateIdError()
 	}
 
 	// check for duplicate
 
-	dataDuplicate, err := r.customerRepo.GetByName(request.CustomerName)
+	dataDuplicate, err := r.customerRepo.GetDuplicateByName(request.CustomerName)
 
 	if err != nil {
 		return utils.CreateCustomerError()

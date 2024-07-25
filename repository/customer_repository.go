@@ -1,13 +1,14 @@
 package repository
 
 import (
+	"fmt"
 	"invoiceBuana/model"
 
 	"gorm.io/gorm"
 )
 
 type CustomerRepository interface {
-	GetByName(name string) (bool, error)
+	GetDuplicateByName(name string) (bool, error)
 	GetAll() ([]model.Customer, error)
 	Create(customer *model.Customer) error
 }
@@ -16,7 +17,7 @@ type customerRepository struct {
 	db *gorm.DB
 }
 
-func (r *customerRepository) GetByName(name string) (bool, error) {
+func (r *customerRepository) GetDuplicateByName(name string) (bool, error) {
 	var count int64
 	query := "SELECT COUNT(*) FROM customers WHERE customer_name = ?"
 	result := r.db.Raw(query, name).Scan(&count)
@@ -34,7 +35,7 @@ func (r *customerRepository) GetByName(name string) (bool, error) {
 func (r *customerRepository) GetAll() ([]model.Customer, error) {
 	var customers []model.Customer
 
-	query := `SELECT id, customer_id, customer_name, customer_address, created_at, updated_at FROM customers`
+	query := `SELECT id, customer_id, customer_name, customer_address, created_at, updated_at FROM Customer`
 
 	rows, err := r.db.Raw(query).Rows()
 	if err != nil {
@@ -65,6 +66,7 @@ func (r *customerRepository) Create(customer *model.Customer) error {
 		return result.Error
 	}
 	customer.ID = uint(result.RowsAffected)
+	fmt.Println(customer.ID)
 	return nil
 }
 
