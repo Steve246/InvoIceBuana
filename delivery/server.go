@@ -27,7 +27,9 @@ func Server() *appServer {
 
 	repoManager := manager.NewRepositoryManager(infra)
 
-	usecaseManager := manager.NewUsecaseManager(repoManager)
+	utilsManager := manager.NewUtilsManager(infra)
+
+	usecaseManager := manager.NewUsecaseManager(repoManager, utilsManager)
 
 	host := appConfig.Url
 	// Add CORS middleware
@@ -40,6 +42,7 @@ func Server() *appServer {
 	}))
 
 	return &appServer{
+
 		usecaseManager: usecaseManager,
 		engine:         router,
 		// router:         router.Group("", nil),
@@ -52,6 +55,8 @@ func Server() *appServer {
 func (a *appServer) initControllers() {
 	// buat daftarin controller ada disini
 	// setiap controller, isinya harus ada isian dari usecaseManager
+
+	controller.NewInvoiceController(a.routerDev, a.usecaseManager.InvoiceUsecase())
 
 	controller.NewItemController(a.routerDev, a.usecaseManager.ItemUsecase())
 

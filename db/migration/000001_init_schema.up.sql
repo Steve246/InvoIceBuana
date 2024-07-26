@@ -1,4 +1,14 @@
 
+
+
+-- created invoice id table
+
+CREATE TABLE InvoiceSequence (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  last_invoice_id INT NOT NULL
+);
+
+
 -- created table customer
 CREATE TABLE Customer (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,7 +38,7 @@ CREATE TABLE Item (
 
 CREATE TABLE Invoice (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  invoice_id INT NOT NULL UNIQUE,
+  invoice_id VARCHAR(255) NOT NULL UNIQUE,
   subject VARCHAR(255) NOT NULL,
   customer_id VARCHAR(255) NOT NULL, 
   issue_date DATETIME NOT NULL,
@@ -47,7 +57,7 @@ CREATE TABLE Invoice (
 
 CREATE TABLE InvoiceItem (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  invoice_id INT NOT NULL, 
+  invoice_id VARCHAR(255) NOT NULL, 
   item_id VARCHAR(255) NOT NULL, 
   quantity INT NOT NULL,
   total_price DECIMAL(10, 2) NOT NULL,

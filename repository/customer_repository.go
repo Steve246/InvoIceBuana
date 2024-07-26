@@ -20,7 +20,7 @@ type customerRepository struct {
 
 func (r *customerRepository) GetDuplicateByName(name string) (bool, error) {
 	var count int64
-	query := "SELECT COUNT(*) FROM customers WHERE customer_name = ?"
+	query := "SELECT COUNT(*) FROM Customer WHERE customer_name = ?"
 	result := r.db.Raw(query, name).Scan(&count)
 	if result.Error != nil {
 		return false, result.Error

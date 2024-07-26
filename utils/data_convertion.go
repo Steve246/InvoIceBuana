@@ -1,6 +1,24 @@
 package utils
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
+
+func StringToUint(s string) (uint, error) {
+	// Convert string to int
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, fmt.Errorf("conversion error: %w", err)
+	}
+
+	// Check if the integer is non-negative and within uint range
+	if i < 0 || i > int(^uint(0)>>1) {
+		return 0, fmt.Errorf("value out of range for uint")
+	}
+
+	return uint(i), nil
+}
 
 func IntToString(i int) string {
 	return strconv.Itoa(i)

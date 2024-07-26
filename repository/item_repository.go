@@ -70,7 +70,7 @@ func (i *itemRepository) GetDuplicateByName(name string) (bool, error) {
 func (i *itemRepository) Create(item *model.Item) error {
 	query := `INSERT INTO Item (item_id, item_name, item_type, item_price)
 	          VALUES (?, ?, ?, ?)`
-	result := i.db.Exec(query, item.ItemId, item.ItemName, item.ItemType, item.ItemPrice)
+	result := i.db.Exec(query, item.Item_ID, item.Item_Name, item.Item_Type, item.Item_Price)
 	if result.Error != nil {
 		return result.Error
 	}

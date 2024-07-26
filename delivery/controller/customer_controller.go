@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"invoiceBuana/delivery/api"
 	"invoiceBuana/model/dto"
 	"invoiceBuana/usecase"
@@ -39,8 +38,6 @@ func (u *CustomerController) addNewCustomer(c *gin.Context) {
 		u.Failed(c, utils.ReqBodyNotValidError())
 		return
 	}
-
-	fmt.Println("ini isi body --> ", bodyRequest)
 
 	err := u.ucCustomer.CreateCustomer(bodyRequest)
 	if err != nil {

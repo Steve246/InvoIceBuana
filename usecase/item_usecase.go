@@ -51,10 +51,10 @@ func (i *itemUsecase) CreateItem(request dto.CreateItem) error {
 	// insert customer
 
 	dataItem := &model.Item{
-		ItemId:    generateCustomerId,
-		ItemName:  request.ItemName,
-		ItemType:  request.ItemType,
-		ItemPrice: request.ItemPrice,
+		Item_ID:    generateCustomerId,
+		Item_Name:  request.ItemName,
+		Item_Type:  request.ItemType,
+		Item_Price: request.ItemPrice,
 	}
 
 	errInsert := i.itemRepo.Create(dataItem)

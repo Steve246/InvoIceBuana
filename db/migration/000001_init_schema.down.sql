@@ -4,7 +4,10 @@
 -- ALTER TABLE Invoice DROP FOREIGN KEY IF EXISTS invoice_ibfk_1;
 
 -- Drop tables only if they exist
+DROP TABLE IF EXISTS InvoiceSequence;
+
 DROP TABLE IF EXISTS InvoiceItem;
 DROP TABLE IF EXISTS Invoice;
 DROP TABLE IF EXISTS Customer;
 DROP TABLE IF EXISTS Item;
+
