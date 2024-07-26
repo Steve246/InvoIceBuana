@@ -37,7 +37,7 @@ func (r *invoiceRepository) GetInvoiceByID(invoiceID string) (model.Invoice, err
 	}
 
 	// Retrieve the customer associated with the invoice
-	customerQuery := `SELECT * FROM Customer WHERE id = ?`
+	customerQuery := `SELECT * FROM Customer WHERE customer_id = ?`
 	err = r.db.Raw(customerQuery, invoice.CustomerID).Scan(&customer).Error
 	if err != nil {
 		return invoice, err
@@ -77,12 +77,6 @@ func (r *invoiceRepository) InsertInvoice(invoiceId string, invoice dto.InvoiceR
 	if result.Error != nil {
 		return "", result.Error
 	}
-
-	// var invoiceID string
-	// r.db.Raw("SELECT LAST_INSERT_ID()").Scan(&invoiceID)
-	// if invoiceID == 0 {
-	// 	return 0, fmt.Errorf("failed to retrieve last insert ID")
-	// }
 
 	return invoiceId, nil
 }

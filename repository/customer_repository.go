@@ -9,6 +9,7 @@ import (
 )
 
 type CustomerRepository interface {
+	GetById(customer_id string) (model.Customer, error)
 	GetDuplicateByName(name string) (bool, error)
 	GetAll(limit, offset string) ([]dto.DisplayCustomer, error)
 	Create(customer *model.Customer) error
@@ -16,6 +17,21 @@ type CustomerRepository interface {
 
 type customerRepository struct {
 	db *gorm.DB
+}
+
+func (r *customerRepository) GetById(customer_id string) (model.Customer, error) {
+	var customer model.Customer
+
+	query := `SELECT * from Customer WHERE customer_id = ?`
+
+	err := r.db.Raw(query, customer_id).Scan(&customer).Error
+	fmt.Println("Ini error ==> ", err)
+	if err != nil {
+
+		return customer, err
+	}
+
+	return customer, nil
 }
 
 func (r *customerRepository) GetDuplicateByName(name string) (bool, error) {

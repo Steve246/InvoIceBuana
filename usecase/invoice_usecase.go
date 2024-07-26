@@ -12,6 +12,8 @@ type InvoiceUsecase interface {
 }
 
 type invoiceUsecase struct {
+	itemRepo     repository.ItemRepository
+	customerRepo repository.CustomerRepository
 	invoiceRepo  repository.InvoiceRepository
 	invoiceUtils utils.InvoiceCounter
 }
@@ -70,7 +72,7 @@ func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceR
 		return dto.InvoiceResponse{}, err
 	}
 
-	fmt.Println("ini data invoice ===>", createdInvoice)
+	// retrieve item
 
 	response := dto.InvoiceResponse{
 		ID:         createdInvoice.ID,
@@ -81,6 +83,9 @@ func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceR
 		DueDate:    createdInvoice.DueDate.Format("2006-01-02"),
 		Status:     createdInvoice.Status,
 		Customer: dto.CustomerResponse{
+			// ID:      customerData.ID,
+			// Name:    customerData.CustomerName,
+			// Address: customerData.CustomerAddress,
 			ID:      createdInvoice.Customer.ID,
 			Name:    createdInvoice.Customer.CustomerName,
 			Address: createdInvoice.Customer.CustomerAddress,
@@ -97,6 +102,8 @@ func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceR
 	}
 
 	for _, item := range createdInvoice.Items {
+
+		fmt.Println("ini dapet Item_ID ==>", item.ItemID)
 		response.Items = append(response.Items, dto.InvoiceItemResponse{
 			ID:         item.ID,
 			ItemName:   item.Item.Item_Name,

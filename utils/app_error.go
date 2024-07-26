@@ -33,6 +33,16 @@ func CreateIdError() error {
 	}
 }
 
+//invoice
+
+func GetCustomerDataError() error {
+	return AppError{
+		ErrorCode:    "400",
+		ErrorMessage: "Get Data Error",
+		ErrorType:    http.StatusBadRequest,
+	}
+}
+
 // item
 
 func GetItemError() error {

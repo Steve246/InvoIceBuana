@@ -9,6 +9,7 @@ import (
 )
 
 type ItemRepository interface {
+	GetById(item_id string) (model.Item, error)
 	GetAll(limit, offset string) ([]dto.DisplayItem, error)
 	GetDuplicateByName(name string) (bool, error)
 	Create(item *model.Item) error
@@ -21,6 +22,20 @@ type itemRepository struct {
 // fungsi untuk tetep display price dengan  2 decimal places
 func formatPrice(price float64) string {
 	return fmt.Sprintf("%.2f", price)
+}
+
+func (i *itemRepository) GetById(item_id string) (model.Item, error) {
+	var items model.Item
+
+	query := `SELECT * FROM Item WHERE item_id = ?`
+
+	err := i.db.Raw(query, item_id).Scan(&items).Error
+
+	if err != nil {
+		return items, fmt.Errorf("failed execute querry ==> %w", err)
+	}
+
+	return items, nil
 }
 
 func (i *itemRepository) GetAll(limit, offset string) ([]dto.DisplayItem, error) {
