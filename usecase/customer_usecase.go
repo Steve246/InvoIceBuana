@@ -8,12 +8,32 @@ import (
 )
 
 type CustomerUsecase interface {
+	UpdateCustomer(customerName string, customerID *string) error
 	GetAllCustomer(limit, offset string) ([]dto.DisplayCustomer, error)
 	CreateCustomer(request dto.CreateCustomer) error
 }
 
 type customerUsecase struct {
 	customerRepo repository.CustomerRepository
+}
+
+func (r *customerUsecase) UpdateCustomer(customerName string, customerID *string) error {
+	customer, err := r.customerRepo.GetCustomerByName(customerName)
+	if err != nil {
+		return err
+	}
+
+	if customer == nil {
+		newCustomerID, err := r.customerRepo.CreateCustomer(customerName)
+		if err != nil {
+			return err
+		}
+		*customerID = newCustomerID
+	} else {
+		*customerID = customer.CustomerID
+	}
+
+	return nil
 }
 
 func (r *customerUsecase) GetAllCustomer(limit, offset string) ([]dto.DisplayCustomer, error) {

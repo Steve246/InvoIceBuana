@@ -10,11 +10,16 @@ import (
 )
 
 type InvoiceRepository interface {
+	UpdateInvoiceDetails(invoiceID string, req dto.UpdateInvoiceRequest, customerID string) error
+	DeleteInvoiceItems(invoiceID string) error
+
 	GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error)
 	GetInvoiceByID(invoiceID string) (model.Invoice, error)
+
 	Begin() *gorm.DB
 	Commit(tx *gorm.DB) error
 	Rollback(tx *gorm.DB) error
+
 	InsertInvoice(invoiceId string, invoice dto.InvoiceRequest) (string, error)
 	InsertInvoiceItems(invoiceID string, items []dto.InvoiceItemRequest) (float64, error)
 	UpdateInvoiceTotals(invoiceID string, subTotal float64) error
@@ -22,6 +27,23 @@ type InvoiceRepository interface {
 
 type invoiceRepository struct {
 	db *gorm.DB
+}
+
+func (r *invoiceRepository) UpdateInvoiceDetails(invoiceID string, req dto.UpdateInvoiceRequest, customerID string) error {
+	query := `UPDATE Invoice 
+              SET subject = ?, issue_date = ?, due_date = ?, customer_id = ? 
+              WHERE invoice_id = ?`
+	result := r.db.Exec(query, req.Subject, req.IssueDate, req.DueDate, customerID, invoiceID)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *invoiceRepository) DeleteInvoiceItems(invoiceID string) error {
+	query := `DELETE FROM InvoiceItem WHERE invoice_id = ?`
+	err := r.db.Exec(query, invoiceID).Error
+	return err
 }
 
 // GetInvoiceAll retrieves all invoices with pagination

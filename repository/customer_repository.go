@@ -4,11 +4,17 @@ import (
 	"fmt"
 	"invoiceBuana/model"
 	"invoiceBuana/model/dto"
+	"invoiceBuana/utils"
 
 	"gorm.io/gorm"
 )
 
 type CustomerRepository interface {
+	UpdateCustomer(customerID string, name string) error
+
+	CreateCustomer(name string) (string, error)
+	GetCustomerByName(name string) (*model.Customer, error)
+
 	GetById(customer_id string) (model.Customer, error)
 	GetDuplicateByName(name string) (bool, error)
 	GetAll(limit, offset string) ([]dto.DisplayCustomer, error)
@@ -17,6 +23,36 @@ type CustomerRepository interface {
 
 type customerRepository struct {
 	db *gorm.DB
+}
+
+// UpdateCustomer updates the customer name based on the customer ID
+func (r *customerRepository) UpdateCustomer(customerID string, name string) error {
+	query := `UPDATE Customer SET customer_name = ? WHERE customer_id = ?`
+	result := r.db.Exec(query, name, customerID)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *customerRepository) CreateCustomer(name string) (string, error) {
+	customerID, _ := utils.GenerateUserID() // Generate a new ID as per your logic
+	query := `INSERT INTO Customer (customer_id, customer_name) VALUES (?, ?)`
+	result := r.db.Exec(query, customerID, name)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	return customerID, nil
+}
+
+func (r *customerRepository) GetCustomerByName(name string) (*model.Customer, error) {
+	var customer model.Customer
+	query := `SELECT * FROM Customer WHERE customer_name = ?`
+	err := r.db.Raw(query, name).Scan(&customer).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	return &customer, nil
 }
 
 func (r *customerRepository) GetById(customer_id string) (model.Customer, error) {

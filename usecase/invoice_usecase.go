@@ -8,6 +8,7 @@ import (
 )
 
 type InvoiceUsecase interface {
+	UpdateInvoice(invoiceID string, req dto.UpdateInvoiceRequest) error
 	GetInvoiceByID(InvoiceId string) (dto.InvoiceResponse, error)
 	GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error)
 	CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceResponse, error)
@@ -18,6 +19,51 @@ type invoiceUsecase struct {
 	customerRepo repository.CustomerRepository
 	invoiceRepo  repository.InvoiceRepository
 	invoiceUtils utils.InvoiceCounter
+}
+
+func (u *invoiceUsecase) UpdateInvoice(invoiceID string, req dto.UpdateInvoiceRequest) error {
+	tx := u.invoiceRepo.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			u.invoiceRepo.Rollback(tx)
+		}
+	}()
+
+	// pastiin id customer yg diinput, itu ada
+	_, err := u.customerRepo.GetById(req.CustomerID)
+	if err != nil {
+		u.invoiceRepo.Rollback(tx)
+		return fmt.Errorf("customer with ID %s does not exist", req.CustomerID)
+	}
+
+	// update data invoice, dengan customer id terbaru
+	err = u.invoiceRepo.UpdateInvoiceDetails(invoiceID, req, req.CustomerID)
+	if err != nil {
+		u.invoiceRepo.Rollback(tx)
+		return err
+	}
+
+	// kalau ada item yg di-delete user, hilangin bersamaan dgn relasinya
+	err = u.invoiceRepo.DeleteInvoiceItems(invoiceID)
+	if err != nil {
+		u.invoiceRepo.Rollback(tx)
+		return err
+	}
+
+	// masukin item terbaru
+	_, err = u.invoiceRepo.InsertInvoiceItems(invoiceID, req.Items)
+	if err != nil {
+		u.invoiceRepo.Rollback(tx)
+		return err
+	}
+
+	// Commit transaction
+	err = u.invoiceRepo.Commit(tx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (u *invoiceUsecase) GetInvoiceByID(InvoiceId string) (dto.InvoiceResponse, error) {

@@ -2,6 +2,21 @@ package dto
 
 import "time"
 
+// for updated invoice
+
+type UpdateInvoiceRequest struct {
+	Subject    string               `json:"subject"`
+	IssueDate  string               `json:"issue_date"`
+	DueDate    string               `json:"due_date"`
+	CustomerID string               `json:"customer_id"`
+	Items      []InvoiceItemRequest `json:"items"`
+}
+
+// type InvoiceItemUpdateRequest struct {
+// 	ItemID   string `json:"item_id"`
+// 	Quantity int    `json:"quantity"`
+// }
+
 type InvoiceDetailResponse struct {
 	InvoiceID      string `json:"invoice_id"`
 	IssueDate      string `json:"issue_date"`

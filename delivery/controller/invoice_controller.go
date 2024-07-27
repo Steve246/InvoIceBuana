@@ -15,10 +15,31 @@ type InvoiceController struct {
 	api.BaseApi
 }
 
-func (i *InvoiceController) getInvoiceById(c *gin.Context) {
-	idParam := c.Query("id")
+func (i *InvoiceController) updateInvoice(c *gin.Context) {
+	var bodyRequest dto.UpdateInvoiceRequest
 
-	data, err := i.ucInvoice.GetInvoiceByID(idParam)
+	if err := i.ParseRequestBody(c, &bodyRequest); err != nil {
+		i.Failed(c, utils.ReqBodyNotValidError())
+		return
+	}
+
+	// Extract invoiceID from the URL
+	invoiceID := c.Param("id")
+
+	err := i.ucInvoice.UpdateInvoice(invoiceID, bodyRequest)
+	if err != nil {
+		i.Failed(c, err)
+		return
+	}
+
+	detailMsg := "Invoice Updated Successfully"
+	i.Success(c, nil, detailMsg, "update")
+}
+
+func (i *InvoiceController) getInvoiceById(c *gin.Context) {
+	invoiceID := c.Param("id")
+
+	data, err := i.ucInvoice.GetInvoiceByID(invoiceID)
 
 	if err != nil {
 		i.Failed(c, err)
@@ -71,7 +92,9 @@ func NewInvoiceController(routerDev *gin.RouterGroup, ucInvoice usecase.InvoiceU
 		BaseApi:   api.BaseApi{},
 	}
 
-	routerDev.GET("/display/customInvoice", controller.getInvoiceById)
+	routerDev.PUT("/update/invoice/:id", controller.updateInvoice)
+
+	routerDev.GET("/display/customInvoice/:id", controller.getInvoiceById)
 
 	routerDev.GET("/display/invoice", controller.getAllInvoice)
 
