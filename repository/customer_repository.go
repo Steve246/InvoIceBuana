@@ -25,7 +25,6 @@ func (r *customerRepository) GetById(customer_id string) (model.Customer, error)
 	query := `SELECT * from Customer WHERE customer_id = ?`
 
 	err := r.db.Raw(query, customer_id).Scan(&customer).Error
-	fmt.Println("Ini error ==> ", err)
 	if err != nil {
 
 		return customer, err

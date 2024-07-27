@@ -55,8 +55,6 @@ func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceR
 		return dto.InvoiceResponse{}, err
 	}
 
-	fmt.Println("ini subTotal ==> ", subTotal)
-
 	// Update Invoice with calculated totals
 	err = u.invoiceRepo.UpdateInvoiceTotals(invoiceID, subTotal)
 	if err != nil {
@@ -103,7 +101,15 @@ func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceR
 
 	for _, item := range createdInvoice.Items {
 
-		fmt.Println("ini dapet Item_ID ==>", item.ItemID)
+		// fmt.Println("ini dapet Item_ID ==>", item.ItemID)
+
+		// dataItem, err := u.itemRepo.GetById(item.ItemID)
+
+		if err != nil {
+			// fmt.Println("ini error ==> ", err)
+			return dto.InvoiceResponse{}, err
+		}
+
 		response.Items = append(response.Items, dto.InvoiceItemResponse{
 			ID:         item.ID,
 			ItemName:   item.Item.Item_Name,

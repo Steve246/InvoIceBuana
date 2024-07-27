@@ -30,7 +30,7 @@ func (i *itemRepository) GetById(item_id string) (model.Item, error) {
 	query := `SELECT * FROM Item WHERE item_id = ?`
 
 	err := i.db.Raw(query, item_id).Scan(&items).Error
-
+	fmt.Println("ini error di GetById => ", err)
 	if err != nil {
 		return items, fmt.Errorf("failed execute querry ==> %w", err)
 	}

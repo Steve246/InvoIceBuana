@@ -28,6 +28,7 @@ func (r *invoiceRepository) GetInvoiceByID(invoiceID string) (model.Invoice, err
 	var invoice model.Invoice
 	var customer model.Customer
 	var items []model.InvoiceItem
+	// var itemDetail model.Item
 
 	// Retrieve the main invoice
 	query := `SELECT * FROM Invoice WHERE invoice_id = ?`
@@ -45,14 +46,43 @@ func (r *invoiceRepository) GetInvoiceByID(invoiceID string) (model.Invoice, err
 	invoice.Customer = customer
 
 	// Retrieve the items associated with the invoice
-	itemsQuery := `SELECT ii.*, i.* 
+	// itemsQuery := `SELECT ii.*, i.*
+	//                FROM InvoiceItem ii
+	//                JOIN Item i ON ii.item_id = i.item_id
+	//                WHERE ii.invoice_id = ?`
+	// err = r.db.Raw(itemsQuery, invoiceID).Scan(&items).Error
+	// if err != nil {
+	// 	return invoice, err
+	// }
+	// invoice.Items = items
+
+	// return invoice, nil
+
+	// Retrieve the items associated with the invoice
+	itemsQuery := `SELECT ii.id, ii.invoice_id, ii.item_id, ii.quantity, ii.total_price, i.id, i.item_id, i.item_name, i.item_type, i.item_price, i.created_at, i.updated_at
                    FROM InvoiceItem ii 
                    JOIN Item i ON ii.item_id = i.item_id 
                    WHERE ii.invoice_id = ?`
-	err = r.db.Raw(itemsQuery, invoiceID).Scan(&items).Error
+	rows, err := r.db.Raw(itemsQuery, invoiceID).Rows()
 	if err != nil {
 		return invoice, err
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var item model.InvoiceItem
+		var itemDetail model.Item
+		if err := rows.Scan(
+			&item.ID, &item.InvoiceID, &item.ItemID, &item.Quantity, &item.TotalPrice,
+			&itemDetail.ID, &itemDetail.Item_ID, &itemDetail.Item_Name, &itemDetail.Item_Type, &itemDetail.Item_Price, &itemDetail.CreatedAt, &itemDetail.UpdatedAt,
+		); err != nil {
+			return invoice, err
+		}
+		item.Item = itemDetail
+		items = append(items, item)
+	}
+	fmt.Println("ini isi items -==> ", items)
+
 	invoice.Items = items
 
 	return invoice, nil
@@ -91,12 +121,8 @@ func (r *invoiceRepository) InsertInvoiceItems(invoiceID string, items []dto.Inv
 			return 0, err
 		}
 
-		fmt.Println("ini ada item quantity ==>", itemReq.Quantity)
-
-		fmt.Println("ini ada item price ==>", item.Item_ID)
-
 		totalPrice := float64(itemReq.Quantity) * item.Item_Price
-		fmt.Println("ini totalPrice ==> ", totalPrice)
+
 		subTotal += totalPrice
 
 		query := `INSERT INTO InvoiceItem (invoice_id, item_id, quantity, total_price) 

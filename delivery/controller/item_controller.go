@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"invoiceBuana/delivery/api"
 	"invoiceBuana/model/dto"
 	"invoiceBuana/usecase"
@@ -38,8 +37,6 @@ func (i *ItemController) addNewItem(c *gin.Context) {
 		i.Failed(c, utils.ReqBodyNotValidError())
 		return
 	}
-
-	fmt.Println("ini isi body --> ", bodyRequest)
 
 	err := i.ucItem.CreateItem(bodyRequest)
 	if err != nil {
