@@ -8,6 +8,7 @@ import (
 )
 
 type InvoiceUsecase interface {
+	GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error)
 	CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceResponse, error)
 }
 
@@ -16,6 +17,28 @@ type invoiceUsecase struct {
 	customerRepo repository.CustomerRepository
 	invoiceRepo  repository.InvoiceRepository
 	invoiceUtils utils.InvoiceCounter
+}
+
+func (u *invoiceUsecase) GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error) {
+	dataInvoices, err := u.invoiceRepo.GetInvoiceAll(limit, offset)
+	if err != nil {
+		return nil, utils.GetInvoiceError()
+	}
+
+	var dataInvoiceMapping []dto.InvoiceDetailResponse
+	for _, dataInvoice := range dataInvoices {
+		dataInvoiceMapping = append(dataInvoiceMapping, dto.InvoiceDetailResponse{
+			InvoiceID:      dataInvoice.InvoiceID,
+			IssueDate:      dataInvoice.IssueDate,
+			SubjectInvoice: dataInvoice.SubjectInvoice,
+			TotalItem:      dataInvoice.TotalItem,
+			CustomerName:   dataInvoice.CustomerName,
+			DueDate:        dataInvoice.DueDate,
+			Status:         dataInvoice.Status,
+		})
+	}
+
+	return dataInvoiceMapping, nil
 }
 
 func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceResponse, error) {
@@ -122,9 +145,11 @@ func (u *invoiceUsecase) CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceR
 	return response, nil
 }
 
-func NewInvoiceUsecase(invoiceRepo repository.InvoiceRepository, invoiceUtils utils.InvoiceCounter) InvoiceUsecase {
+func NewInvoiceUsecase(invoiceRepo repository.InvoiceRepository, invoiceUtils utils.InvoiceCounter, itemRepo repository.ItemRepository, customerRepo repository.CustomerRepository) InvoiceUsecase {
 	usecase := new(invoiceUsecase)
 	usecase.invoiceRepo = invoiceRepo
 	usecase.invoiceUtils = invoiceUtils
+	usecase.customerRepo = customerRepo
+	usecase.itemRepo = itemRepo
 	return usecase
 }

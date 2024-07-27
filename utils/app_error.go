@@ -35,10 +35,10 @@ func CreateIdError() error {
 
 //invoice
 
-func GetCustomerDataError() error {
+func GetInvoiceError() error {
 	return AppError{
 		ErrorCode:    "400",
-		ErrorMessage: "Get Data Error",
+		ErrorMessage: "Get Invoice Error",
 		ErrorType:    http.StatusBadRequest,
 	}
 }

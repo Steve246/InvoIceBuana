@@ -10,6 +10,7 @@ import (
 )
 
 type InvoiceRepository interface {
+	GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error)
 	GetInvoiceByID(invoiceID string) (model.Invoice, error)
 	Begin() *gorm.DB
 	Commit(tx *gorm.DB) error
@@ -21,6 +22,40 @@ type InvoiceRepository interface {
 
 type invoiceRepository struct {
 	db *gorm.DB
+}
+
+// GetInvoiceAll retrieves all invoices with pagination
+func (r *invoiceRepository) GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error) {
+	var invoiceDetails []dto.InvoiceDetailResponse
+
+	// Define the query to retrieve all invoices with related customer name and item count with pagination
+	query := `
+		SELECT i.invoice_id, i.issue_date, i.subject, COUNT(ii.id) AS total_item, c.customer_name, i.due_date, i.status
+		FROM Invoice i
+		LEFT JOIN InvoiceItem ii ON i.invoice_id = ii.invoice_id
+		LEFT JOIN Customer c ON i.customer_id = c.customer_id
+		GROUP BY i.invoice_id, i.issue_date, i.subject, c.customer_name, i.due_date, i.status
+		ORDER BY i.invoice_id
+		LIMIT ? OFFSET ?
+	`
+
+	// Execute the query and scan the result into the slice of InvoiceDetailResponse
+	rows, err := r.db.Raw(query, limit, offset).Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var invoiceDetail dto.InvoiceDetailResponse
+		err := rows.Scan(&invoiceDetail.InvoiceID, &invoiceDetail.IssueDate, &invoiceDetail.SubjectInvoice, &invoiceDetail.TotalItem, &invoiceDetail.CustomerName, &invoiceDetail.DueDate, &invoiceDetail.Status)
+		if err != nil {
+			return nil, err
+		}
+		invoiceDetails = append(invoiceDetails, invoiceDetail)
+	}
+
+	return invoiceDetails, nil
 }
 
 // Get Invoice by ID with related data

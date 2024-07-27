@@ -14,7 +14,7 @@ type usecaseManager struct {
 }
 
 func (u *usecaseManager) InvoiceUsecase() usecase.InvoiceUsecase {
-	return usecase.NewInvoiceUsecase(u.repoManager.InvoiceRepo(), u.utilsManager.InvoiceIdUtils())
+	return usecase.NewInvoiceUsecase(u.repoManager.InvoiceRepo(), u.utilsManager.InvoiceIdUtils(), u.repoManager.ItemRepo(), u.repoManager.CustomerRepo())
 }
 
 func (u *usecaseManager) ItemUsecase() usecase.ItemUsecase {

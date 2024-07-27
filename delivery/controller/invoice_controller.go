@@ -15,6 +15,21 @@ type InvoiceController struct {
 	api.BaseApi
 }
 
+func (i *InvoiceController) getAllInvoice(c *gin.Context) {
+	limitParam := c.DefaultQuery("limit", "10")
+	offsetParam := c.DefaultQuery("offset", "0")
+
+	data, err := i.ucInvoice.GetInvoiceAll(limitParam, offsetParam)
+
+	if err != nil {
+		i.Failed(c, err)
+		return
+	}
+
+	detailMsg := "Invoice Data Succesfully Retrieved"
+	i.Success(c, data, detailMsg, "register")
+}
+
 func (i *InvoiceController) addNewInvoice(c *gin.Context) {
 	var bodyRequest dto.InvoiceRequest
 
@@ -41,6 +56,8 @@ func NewInvoiceController(routerDev *gin.RouterGroup, ucInvoice usecase.InvoiceU
 		ucInvoice: ucInvoice,
 		BaseApi:   api.BaseApi{},
 	}
+
+	routerDev.GET("/display/invoice", controller.getAllInvoice)
 
 	routerDev.POST("/add/invoice", controller.addNewInvoice)
 }
