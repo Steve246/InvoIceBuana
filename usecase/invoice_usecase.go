@@ -8,6 +8,7 @@ import (
 )
 
 type InvoiceUsecase interface {
+	GetInvoiceByID(InvoiceId string) (dto.InvoiceResponse, error)
 	GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error)
 	CreateInvoice(invoice dto.InvoiceRequest) (dto.InvoiceResponse, error)
 }
@@ -17,6 +18,66 @@ type invoiceUsecase struct {
 	customerRepo repository.CustomerRepository
 	invoiceRepo  repository.InvoiceRepository
 	invoiceUtils utils.InvoiceCounter
+}
+
+func (u *invoiceUsecase) GetInvoiceByID(InvoiceId string) (dto.InvoiceResponse, error) {
+	// Retrieve the created invoice with all related data
+
+	createdInvoice, err := u.invoiceRepo.GetInvoiceByID(InvoiceId)
+	if err != nil {
+		return dto.InvoiceResponse{}, err
+	}
+
+	// retrieve item
+
+	response := dto.InvoiceResponse{
+		ID:         createdInvoice.ID,
+		InvoiceID:  createdInvoice.InvoiceID,
+		Subject:    createdInvoice.Subject,
+		CustomerID: createdInvoice.CustomerID,
+		IssueDate:  createdInvoice.IssueDate.Format("2006-01-02"),
+		DueDate:    createdInvoice.DueDate.Format("2006-01-02"),
+		Status:     createdInvoice.Status,
+		Customer: dto.CustomerResponse{
+			// ID:      customerData.ID,
+			// Name:    customerData.CustomerName,
+			// Address: customerData.CustomerAddress,
+			ID:      createdInvoice.Customer.ID,
+			Name:    createdInvoice.Customer.CustomerName,
+			Address: createdInvoice.Customer.CustomerAddress,
+		},
+		Items: []dto.InvoiceItemResponse{},
+		Totals: dto.TotalsResponse{
+			TotalItems: len(createdInvoice.Items),
+			Subtotal:   createdInvoice.SubTotal,
+			Tax:        createdInvoice.Tax,
+			GrandTotal: createdInvoice.GrandTotal,
+		},
+		CreatedAt: createdInvoice.CreatedAt,
+		UpdatedAt: createdInvoice.UpdatedAt,
+	}
+
+	for _, item := range createdInvoice.Items {
+
+		// fmt.Println("ini dapet Item_ID ==>", item.ItemID)
+
+		// dataItem, err := u.itemRepo.GetById(item.ItemID)
+
+		if err != nil {
+			// fmt.Println("ini error ==> ", err)
+			return dto.InvoiceResponse{}, err
+		}
+
+		response.Items = append(response.Items, dto.InvoiceItemResponse{
+			ID:         item.ID,
+			ItemName:   item.Item.Item_Name,
+			Quantity:   item.Quantity,
+			UnitPrice:  item.Item.Item_Price,
+			TotalPrice: item.TotalPrice,
+		})
+	}
+
+	return response, nil
 }
 
 func (u *invoiceUsecase) GetInvoiceAll(limit, offset string) ([]dto.InvoiceDetailResponse, error) {
